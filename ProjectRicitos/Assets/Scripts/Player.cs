@@ -1,12 +1,11 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
     private InputActionAsset inputActions;
-    [SerializeField]
-    private GameObject groundCheck;
     [SerializeField]
     private LayerMask groundLayer;
     [SerializeField] 
@@ -17,12 +16,19 @@ public class Player : MonoBehaviour
     private InputAction move;
     private InputAction jump;
     private Vector2 movementDirection;
+    [SerializeField]
     private Collider2D playerCollider;
 
     [SerializeField]
     private float speed;
     [SerializeField]
     private float jumpForce;
+    [SerializeField]
+    private float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
+    [SerializeField]
+    private float jumpBufferTime = 0.15f;
+    private float jumpBufferCounter;
     [SerializeField] 
     private float wallCheckDistance = 0.2f;
     [SerializeField] 
@@ -63,8 +69,18 @@ public class Player : MonoBehaviour
     void Update()
     {
         movementDirection = move.ReadValue<Vector2>();
-        
-        if(jump.WasPressedThisFrame() && IsGrounded())
+
+        if (IsGrounded())
+            coyoteTimeCounter = coyoteTime;
+        else
+            coyoteTimeCounter -= Time.deltaTime;
+
+        if (jump.WasPressedThisFrame())
+            jumpBufferCounter = jumpBufferTime;
+        else
+            jumpBufferCounter -= Time.deltaTime;
+
+        if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f)
         {
             Jump();
         }
@@ -75,22 +91,25 @@ public class Player : MonoBehaviour
 
         if (canWallJump && jump.WasPressedThisFrame())
         {
-            Debug.Log("Brincar");
             DoWallJump();
         }
 
-        /*Debug.Log("IsTouchingWall: " + isTouchingWall);
-        Debug.Log("TocaPiso: " + IsGrounded());
-        Debug.Log("Velocidad Y: " + rb.linearVelocityY);*/
 
-        if (isTouchingWall && !IsGrounded())
+        if (isTouchingWall && !IsGrounded() && rb.linearVelocityY < 0.15f)
         {
             Debug.Log("Deslizarse");
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, wallSlideSpeed);
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Min(rb.linearVelocityY, -wallSlideSpeed));
+            jumpBufferCounter = 0f;
+            Debug.Log("Velcoidad Y: " + rb.linearVelocityY);
         }
 
         if (lockTimer > 0)
             lockTimer -= Time.deltaTime;
+
+        if (rb.linearVelocityY < 0)
+            rb.gravityScale = 4f;
+        else
+            rb.gravityScale = 2f;
     }
 
     private void FixedUpdate()
@@ -101,6 +120,8 @@ public class Player : MonoBehaviour
     public void Jump()
     {
         rb.AddForceAtPosition(new Vector2(0, 1) * jumpForce, Vector2.up, ForceMode2D.Impulse);
+        coyoteTimeCounter = 0f;
+        jumpBufferCounter = 0f;
     }
 
     public void Walk()
@@ -155,7 +176,7 @@ public class Player : MonoBehaviour
 
         RaycastHit2D hit = Physics2D.BoxCast(
             origin,
-            new Vector2(0.1f, bounds.size.y * 0.8f),
+            new Vector2(1.1f, bounds.size.y * 0.8f),
             0f,
             wallOnRight ? Vector2.right : Vector2.left,
             wallCheckDistance,
@@ -177,8 +198,8 @@ public class Player : MonoBehaviour
             isTouchingWall = false;
         }*/
 
-        Debug.Log("isTouchingWall: " + hit.ToString());
         canWallJump = hit && !IsGrounded();
+        isTouchingWall = hit;
     }
 
     private void DoWallJump()
@@ -190,12 +211,13 @@ public class Player : MonoBehaviour
             wallOnRight ? -wallJumpForceX : wallJumpForceX,
             wallJumpForceY
         );
-
+        jumpBufferCounter = 0f;
         rb.AddForce(force, ForceMode2D.Impulse);
     }
 
     private void OnDrawGizmos()
     {
-        
+        Bounds bounds = playerCollider.bounds;
+        Gizmos.DrawCube(transform.position, new Vector2(1.1f, bounds.size.y * 0.8f));
     }
 }
