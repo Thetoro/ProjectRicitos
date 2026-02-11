@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5822431982675202981}
+  - component: {fileID: 3457426956490920831}
   - component: {fileID: 4028044544629148506}
   - component: {fileID: 4980029756939930128}
   - component: {fileID: 4453135575526548238}
@@ -36,6 +37,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3457426956490920831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 739329356519136592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad4beec1c2121a4ca8f96b7bc361aff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DEBUG
+  velocidadX: {fileID: 0}
+  velocidadY: {fileID: 0}
 --- !u!114 &4028044544629148506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,10 +72,14 @@ MonoBehaviour:
     m_Bits: 128
   playerCollider: {fileID: 4453135575526548238}
   speed: 10
-  jumpForce: 10
+  jumpForce: 8
+  jumpContinuesForce: 1
+  acceleration: 50
+  deceleration: 45
+  airControlMultiplier: 1
   coyoteTime: 0.2
-  jumpBufferTime: 0.15
-  wallCheckDistance: 0.5
+  jumpBufferTime: 0.9
+  wallCheckDistance: 0.6
   wallJumpForceX: 4
   wallJumpForceY: 8
   wallJumpLockTime: 0.2
@@ -214,7 +233,19 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4028044544629148506}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]'
   - m_PersistentCalls:
