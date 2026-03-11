@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5822431982675202981}
-  - component: {fileID: 3457426956490920831}
   - component: {fileID: 4028044544629148506}
   - component: {fileID: 4980029756939930128}
   - component: {fileID: 4453135575526548238}
@@ -37,20 +36,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3457426956490920831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 739329356519136592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad4beec1c2121a4ca8f96b7bc361aff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DEBUG
-  velocidadX: {fileID: 0}
-  velocidadY: {fileID: 0}
 --- !u!114 &4028044544629148506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,7 +68,7 @@ MonoBehaviour:
   wallJumpForceX: 4
   wallJumpForceY: 8
   wallJumpLockTime: 0.2
-  wallSlideSpeed: 8
+  wallSlideSpeed: 6
   groundCheckDistance: 0.1
 --- !u!212 &4980029756939930128
 SpriteRenderer:
@@ -205,7 +190,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &3394950719435828495
 MonoBehaviour:

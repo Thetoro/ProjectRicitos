@@ -120,6 +120,7 @@ public class Player : MonoBehaviour
         {
             coyoteTimeCounter = coyoteTime;
             isWallJumping = false; // Resetear wall jump cuando toca el suelo
+            isTouchingWall = false; //Resetear detección de pared cuando está en el suelo
         }
         else
             coyoteTimeCounter -= Time.deltaTime;
@@ -130,7 +131,17 @@ public class Player : MonoBehaviour
         else
             jumpBufferCounter -= Time.deltaTime;
 
-        CheckWall();
+        // Solo verificar paredes cuando NO está en el suelo
+        if (!IsGrounded())
+        {
+            CheckWall();
+        }
+        else
+        {
+            // Cuando está en el suelo, resetear las variables de pared
+            isTouchingWall = false;
+            canWallJump = false;
+        }
 
         //Wall Jump
         if (canWallJump && jump.WasPressedThisFrame())
@@ -145,15 +156,6 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        //Deslizarse por la pared
-        if (isTouchingWall && !IsGrounded() && rb.linearVelocityY < 0.15f)
-        {
-            //Debug.Log("Deslizarse");
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Min(rb.linearVelocityY, -wallSlideSpeed));
-            jumpBufferCounter = 0f;
-
-        }
-
         if (lockTimer > 0)
             lockTimer -= Time.deltaTime;
 
@@ -161,7 +163,6 @@ public class Player : MonoBehaviour
         if (jump.IsPressed() && rb.linearVelocityY > 0)
         {
             rb.AddForceY(jumpContinuesForce, ForceMode2D.Force);
-            Debug.Log("Velocidad Y: " + rb.linearVelocityY);
         }
             
 
@@ -180,6 +181,7 @@ public class Player : MonoBehaviour
         {
             ApplyMovement();
         }
+        WallSlide();
     }
 
     private void ApplyMovement()
@@ -189,6 +191,7 @@ public class Player : MonoBehaviour
             return;
 
         float targetSpeed = movementDirection.x * speed;
+        float currentHorizontalSpeed = rb.linearVelocityX; // ← Usamos la velocidad real
         bool isGrounded = IsGrounded();
 
         // Ajustar aceleración/desaceleración basado en si está en el suelo o aire
@@ -197,7 +200,7 @@ public class Player : MonoBehaviour
 
         if (isMoving)
         {
-            // Si está en una pared, reducir el control
+            // Si está en una pared, reducir el control (opcional, puedes ajustar)
             if (isTouchingWall && !isGrounded)
             {
                 currentAcceleration *= 0.3f;
@@ -205,8 +208,8 @@ public class Player : MonoBehaviour
             }
 
             // Aceleración progresiva hacia la velocidad objetivo
-            currentSpeed = Mathf.MoveTowards(
-                currentSpeed,
+            currentHorizontalSpeed = Mathf.MoveTowards(
+                currentHorizontalSpeed,
                 targetSpeed,
                 currentAcceleration * Time.fixedDeltaTime
             );
@@ -214,22 +217,24 @@ public class Player : MonoBehaviour
         else
         {
             // Desaceleración progresiva cuando no hay input
-            currentSpeed = Mathf.MoveTowards(
-                currentSpeed,
+            currentHorizontalSpeed = Mathf.MoveTowards(
+                currentHorizontalSpeed,
                 0f,
                 currentDeceleration * Time.fixedDeltaTime
             );
         }
 
         // Aplicar velocidad horizontal manteniendo velocidad vertical
-        Vector2 newVelocity = new Vector2(currentSpeed, rb.linearVelocityY);
-        rb.linearVelocity = newVelocity;
+        rb.linearVelocity = new Vector2(currentHorizontalSpeed, rb.linearVelocityY);
     }
 
 
     public void Jump()
     {
-        rb.AddForceAtPosition(new Vector2(0, 1) * jumpForce, Vector2.up, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(rb.linearVelocityX, 0); // Reset vertical velocity
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
+        // Reset counters
         coyoteTimeCounter = 0f;
         jumpBufferCounter = 0f;
     }
@@ -263,13 +268,16 @@ public class Player : MonoBehaviour
             groundLayer
         );
         
-        Debug.DrawRay(origin, Vector2.down * distance, hit.collider ? Color.green : Color.red);
+        bool isGrounded = hit.collider != null;
+        Debug.DrawRay(origin, Vector2.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
 
-        return hit;
+        return isGrounded;
     }
 
     private void CheckWall()
     {
+        if (playerCollider == null) return;
+
         Bounds bounds = playerCollider.bounds;
         Vector2 origin = bounds.center;
 
@@ -340,9 +348,22 @@ public class Player : MonoBehaviour
     private void EndWallJump()
     {
         isWallJumping = false;
-        currentSpeed = rb.linearVelocityX; // Sincronizar la velocidad horizontal
+        //currentSpeed = rb.linearVelocityX; // Sincronizar la velocidad horizontal
         //Debug.Log("Wall Jump terminado, movimiento normal restaurado");
     }
+
+    private void WallSlide()
+    {
+        //Deslizarse por la pared
+        if (isTouchingWall && !IsGrounded() && rb.linearVelocityY < 0.15f)
+        {
+            Debug.Log("Deslizarse");
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -wallSlideSpeed));
+            jumpBufferCounter = 0f;
+
+        }
+    }
+
 
     /*private void OnDrawGizmos()
     {

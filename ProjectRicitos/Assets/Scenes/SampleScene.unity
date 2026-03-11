@@ -1432,14 +1432,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3457426956490920831, guid: 444fe5ee087f41749b5d876b4d0adf02, type: 3}
-      propertyPath: velocidadX
-      value: 
-      objectReference: {fileID: 256074996}
-    - target: {fileID: 3457426956490920831, guid: 444fe5ee087f41749b5d876b4d0adf02, type: 3}
-      propertyPath: velocidadY
-      value: 
-      objectReference: {fileID: 54187105}
     - target: {fileID: 5822431982675202981, guid: 444fe5ee087f41749b5d876b4d0adf02, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.51957
@@ -1479,10 +1471,6 @@ PrefabInstance:
     - target: {fileID: 5822431982675202981, guid: 444fe5ee087f41749b5d876b4d0adf02, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8260224213977150822, guid: 444fe5ee087f41749b5d876b4d0adf02, type: 3}
-      propertyPath: m_CollisionDetection
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
