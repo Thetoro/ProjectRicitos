@@ -14,7 +14,11 @@ public class MovingPlatform : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        nextPosition = pointB.position;
+        int randomNumber = Random.Range(0, 11);
+        if(randomNumber >= 1 || randomNumber <= 5)
+            nextPosition = pointA.position;
+        else if(randomNumber > 5 || randomNumber <= 10)
+            nextPosition = pointB.position;
     }
 
     // Update is called once per frame
